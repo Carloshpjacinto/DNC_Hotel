@@ -4,6 +4,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDTO } from './domain/dto/createUser.dto';
 import { UpdateUserDTO } from './domain/dto/updateUser.dto';
 import * as bcrypt from 'bcrypt';
+import { userSelectFields } from '../utils/userSelectFields';
 
 @Injectable()
 export class UserService {
@@ -11,17 +12,17 @@ export class UserService {
 
   async createUser(body: CreateUserDTO): Promise<User> {
     body.password = await this.hashPassword(body.password);
-    return await this.prisma.user.create({ data: body });
+    return await this.prisma.user.create({ data: body, select: userSelectFields });
   }
 
   async list() {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({select: userSelectFields});
   }
 
   async show(id: string) {
     await this.isIdExists(id);
 
-    return await this.prisma.user.findUnique({ where: { id: Number(id) } });
+    return await this.prisma.user.findUnique({ where: { id: Number(id) }, select: userSelectFields });
   }
 
   async update(id: string, body: UpdateUserDTO) {
@@ -32,12 +33,13 @@ export class UserService {
     return await this.prisma.user.update({
       where: { id: Number(id) },
       data: body,
+      select: userSelectFields
     });
   }
 
   async delete(id: string) {
     await this.isIdExists(id);
-    return await this.prisma.user.delete({ where: { id: Number(id) } });
+    return await this.prisma.user.delete({ where: { id: Number(id) }, select: userSelectFields});
   }
 
   private async hashPassword(password: string) {
