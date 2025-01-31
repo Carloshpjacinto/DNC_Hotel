@@ -51,6 +51,12 @@ export class UserService {
     });
   }
 
+  async findByEmail(email: string) {
+    return await this.prisma.user.findUnique({
+      where: { email },
+    });
+  }
+
   private async hashPassword(password: string) {
     return await bcrypt.hash(password, 10);
   }
