@@ -53,11 +53,13 @@ export class AuthService {
   }
 
   async resetPassword({ password, token }: AuthResetPasswordDTO) {
-    const { valid, decoded } = await this.validateToken(token)
+    const { valid, decoded } = await this.validateToken(token);
 
     if (!valid || !decoded) throw new UnauthorizedException('Invalid token');
 
-    const user = await this.userService.update(Number(decoded.sub), { password });
+    const user = await this.userService.update(Number(decoded.sub), {
+      password,
+    });
 
     return await this.generateJwtToken(user);
   }
@@ -69,7 +71,7 @@ export class AuthService {
       throw new UnauthorizedException('Email is incorrect');
     }
 
-    const token = this.generateJwtToken(user, "30m");
+    const token = this.generateJwtToken(user, '30m');
 
     // Enviar o email com o token jwt para resetar a senha
     return token;
