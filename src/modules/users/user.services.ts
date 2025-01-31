@@ -12,43 +12,52 @@ export class UserService {
 
   async createUser(body: CreateUserDTO): Promise<User> {
     body.password = await this.hashPassword(body.password);
-    return await this.prisma.user.create({ data: body, select: userSelectFields });
+    return await this.prisma.user.create({
+      data: body,
+      select: userSelectFields,
+    });
   }
 
   async list() {
-    return await this.prisma.user.findMany({select: userSelectFields});
+    return await this.prisma.user.findMany({ select: userSelectFields });
   }
 
-  async show(id: string) {
+  async show(id: number) {
     await this.isIdExists(id);
 
-    return await this.prisma.user.findUnique({ where: { id: Number(id) }, select: userSelectFields });
+    return await this.prisma.user.findUnique({
+      where: { id },
+      select: userSelectFields,
+    });
   }
 
-  async update(id: string, body: UpdateUserDTO) {
+  async update(id: number, body: UpdateUserDTO) {
     await this.isIdExists(id);
 
     if (body.password) body.password = await this.hashPassword(body.password);
 
     return await this.prisma.user.update({
-      where: { id: Number(id) },
+      where: { id },
       data: body,
-      select: userSelectFields
+      select: userSelectFields,
     });
   }
 
-  async delete(id: string) {
+  async delete(id: number) {
     await this.isIdExists(id);
-    return await this.prisma.user.delete({ where: { id: Number(id) }, select: userSelectFields});
+    return await this.prisma.user.delete({
+      where: { id },
+      select: userSelectFields,
+    });
   }
 
   private async hashPassword(password: string) {
     return await bcrypt.hash(password, 10);
   }
 
-  private async isIdExists(id: string) {
+  private async isIdExists(id: number) {
     const user = await this.prisma.user.findUnique({
-      where: { id: Number(id) },
+      where: { id },
     });
 
     if (!user) throw new NotFoundException('User not found');
