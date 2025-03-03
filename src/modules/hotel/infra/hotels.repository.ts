@@ -14,11 +14,19 @@ export class HotelsRepositories implements IHotelRepository {
     return this.prisma.hotel.create({ data });
   }
 
-  findHotelById(id: number): Promise<Hotel | null> {
-    return this.prisma.hotel.findUnique({
-      where: { id: Number(id) },
-      include: { owner: true },
-    });
+  async findHotelById(id: number): Promise<Hotel | null> {
+    return this.prisma.hotel
+      .findUnique({
+        where: { id: Number(id) },
+        include: { owner: true },
+      })
+      .then((hotel) => {
+        if (hotel.owner.avatar) {
+          hotel.owner.avatar = `${process.env.APP_API_URL}/user-avatar/${hotel.owner.avatar}`;
+        }
+
+        return hotel;
+      });
   }
   findHotelByName(name: string): Promise<Hotel[] | null> {
     return this.prisma.hotel.findMany({
@@ -26,12 +34,22 @@ export class HotelsRepositories implements IHotelRepository {
     });
   }
 
-  findHotels(offSet: number, limit: number): Promise<Hotel[]> {
-    return this.prisma.hotel.findMany({
-      take: limit,
-      skip: offSet,
-      include: { owner: true },
-    });
+  async findHotels(offSet: number, limit: number): Promise<Hotel[]> {
+    return this.prisma.hotel
+      .findMany({
+        take: limit,
+        skip: offSet,
+        include: { owner: true },
+      })
+      .then((hotels) => {
+        hotels.forEach((reservation) => {
+          if (reservation.owner.avatar) {
+            reservation.owner.avatar = `${process.env.APP_API_URL}/user-avatar/${reservation.owner.avatar}`;
+          }
+        });
+
+        return hotels;
+      });
   }
 
   countHotels(): Promise<number> {

@@ -12,9 +12,17 @@ export class ReservationRepository implements IReservationRepository {
   }
 
   async findById(id: number): Promise<Reservation> {
-    const reservation = await this.prisma.reservation.findUnique({
-      where: { id },
-    });
+    const reservation = await this.prisma.reservation
+      .findUnique({
+        where: { id },
+        include: { user: true },
+      })
+      .then((reservation) => {
+        if (reservation.user.avatar) {
+          reservation.user.avatar = `${process.env.APP_API_URL}/user-avatar/${reservation.user.avatar}`;
+        }
+        return reservation;
+      });
 
     if (!reservation) {
       throw new Error('Reserva não encontrada');

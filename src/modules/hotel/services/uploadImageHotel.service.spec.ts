@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IHotelRepository } from '../domain/repositories/IHotel.repositories'; 
+import { IHotelRepository } from '../domain/repositories/IHotel.repositories';
 import { UploadImageHotelService } from './uploadImageHotel.service';
 import { REPOSITORY_TOKEN_HOTEL } from '../utils/repositoriesTokens';
 import { NotFoundException } from '@nestjs/common';

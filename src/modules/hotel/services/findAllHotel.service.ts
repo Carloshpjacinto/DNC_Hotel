@@ -14,8 +14,7 @@ export class FindAllHotelsService {
   ) {}
 
   async execute(page: number = 1, limit: number = 10) {
-
-    let data:any;
+    let data: any;
 
     const offSet = (page - 1) * limit;
 
@@ -23,9 +22,8 @@ export class FindAllHotelsService {
 
     const dataRedis = await this.redis.get(REDIS_HOTEL_KEY);
 
-    if(!dataRedis){
-
-      console.log("Não existe mas vou salvar")
+    if (!dataRedis) {
+      console.log('Não existe mas vou salvar');
       data = await this.hotelRepositories.findHotels(offSet, limit);
       await this.redis.set(REDIS_HOTEL_KEY, JSON.stringify(data));
 
@@ -35,8 +33,7 @@ export class FindAllHotelsService {
         per_page: limit,
         data,
       };
-    }else{
-
+    } else {
       data = JSON.parse(dataRedis);
 
       return {

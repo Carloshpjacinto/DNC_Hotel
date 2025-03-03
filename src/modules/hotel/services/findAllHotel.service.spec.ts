@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IHotelRepository } from '../domain/repositories/IHotel.repositories'; 
+import { IHotelRepository } from '../domain/repositories/IHotel.repositories';
 import { FindAllHotelsService } from './findAllHotel.service';
 import { REPOSITORY_TOKEN_HOTEL } from '../utils/repositoriesTokens';
 import { Hotel } from '@prisma/client';
