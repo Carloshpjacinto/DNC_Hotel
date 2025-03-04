@@ -14,6 +14,12 @@ export class FindOneHotelsService {
   ) {}
   async execute(id: number) {
     await this.redis.del(REDIS_HOTEL_KEY);
-    return await this.hotelRepositories.findHotelById(id);
+    return await this.hotelRepositories.findHotelById(id).then((hotel) => {
+      if (hotel.image) {
+        hotel.image = `${process.env.APP_API_URL}/hotel-image/${hotel.image}`;
+      }
+
+      return hotel;
+    });
   }
 }

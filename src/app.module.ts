@@ -7,6 +7,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HotelsModule } from './modules/hotel/hotel.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     ThrottlerModule.forRoot([
       {
         ttl: 5000,
-        limit: 5,
+        limit: 3,
       },
     ]),
     MailerModule.forRoot({
@@ -31,6 +33,16 @@ import { RedisModule } from '@nestjs-modules/ioredis';
       type: 'single',
       url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
     }),
+    ServeStaticModule.forRoot(
+      {
+        rootPath: join(__dirname, '..', 'uploads'),
+        serveRoot: '/user-avatar',
+      },
+      {
+        rootPath: join(__dirname, '..', 'uploads-hotel'),
+        serveRoot: '/hotel-image',
+      },
+    ),
   ],
   providers: [
     {
