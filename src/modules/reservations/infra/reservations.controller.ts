@@ -10,6 +10,7 @@ import { ReservationStatus, Role } from '@prisma/client';
 import { UpdateStatusReservationsService } from '../services/updateStatusReservations.service';
 import { RoleGuard } from 'src/shared/guards/role.guard';
 import { Roles } from 'src/shared/decorators/roles.decorators';
+import { FindByUserReservationsService } from '../services/findByUserReservations.service';
 
 @UseGuards(AuthGuard, RoleGuard)
 @Controller('reservations')
@@ -19,6 +20,7 @@ export class ReservationsController {
     private readonly findAllReservationsService: FindAllReservationsService,
     private readonly findByIdReservationsService: FindByIdReservationsService,
     private readonly updateStatusReservationsService: UpdateStatusReservationsService,
+    private readonly findByUserReservationsService: FindByUserReservationsService,
   ) {}
 
   @Roles(Role.USER)
@@ -34,7 +36,7 @@ export class ReservationsController {
 
   @Get('user')
   findByUser(@User('id') id: number) {
-    return this.findByIdReservationsService.execute(id);
+    return this.findByUserReservationsService.execute(id);
   }
 
   @Get(':id')

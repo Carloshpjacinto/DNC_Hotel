@@ -8,6 +8,7 @@ export class ReservationRepository implements IReservationRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   create(data: any): Promise<Reservation> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return this.prisma.reservation.create({ data });
   }
 
