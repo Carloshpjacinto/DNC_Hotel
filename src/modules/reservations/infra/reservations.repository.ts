@@ -35,7 +35,10 @@ export class ReservationRepository implements IReservationRepository {
     return this.prisma.reservation.findMany();
   }
   findByUser(userId: number): Promise<Reservation[]> {
-    return this.prisma.reservation.findMany({ where: { userId } });
+    return this.prisma.reservation.findMany({
+      where: { userId },
+      orderBy: { id: 'desc' },
+    });
   }
 
   updateStatus(id: number, status: ReservationStatus): Promise<Reservation> {

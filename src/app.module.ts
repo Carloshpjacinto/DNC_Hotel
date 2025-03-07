@@ -18,7 +18,7 @@ import { join } from 'path';
     ThrottlerModule.forRoot([
       {
         ttl: 5000,
-        limit: 3,
+        limit: 10,
       },
     ]),
     MailerModule.forRoot({

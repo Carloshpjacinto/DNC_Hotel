@@ -13,6 +13,7 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createUser(body: CreateUserDTO): Promise<User> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     body.password = await this.hashPassword(body.password);
     return await this.prisma.user.create({
       data: body,
@@ -27,15 +28,23 @@ export class UserService {
   async show(id: number) {
     await this.isIdExists(id);
 
-    return await this.prisma.user.findUnique({
-      where: { id },
-      select: userSelectFields,
-    });
+    return await this.prisma.user
+      .findUnique({
+        where: { id },
+        select: userSelectFields,
+      })
+      .then((user) => {
+        if (user.avatar) {
+          user.avatar = `${process.env.APP_API_URL}/user-avatar/${user.avatar}`;
+        }
+        return user;
+      });
   }
 
   async update(id: number, body: UpdateUserDTO) {
     await this.isIdExists(id);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     if (body.password) body.password = await this.hashPassword(body.password);
 
     return await this.prisma.user.update({
@@ -78,6 +87,7 @@ export class UserService {
   }
 
   private async hashPassword(password: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     return await bcrypt.hash(password, 10);
   }
 
