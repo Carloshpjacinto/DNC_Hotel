@@ -57,7 +57,15 @@ export class HotelsRepositories implements IHotelRepository {
   }
 
   findHotelByOwner(ownerId: number): Promise<Hotel[]> {
-    return this.prisma.hotel.findMany({ where: { ownerId } });
+    return this.prisma.hotel.findMany({ where: { ownerId } }).then((hotels) => {
+      hotels.forEach((hotel) => {
+        if (hotel.image) {
+          hotel.image = `${process.env.APP_API_URL}/hotel-image/${hotel.image}`;
+        }
+      });
+
+      return hotels;
+    });
   }
 
   updateHotel(id: number, data: UpdateHotelDto): Promise<Hotel> {
