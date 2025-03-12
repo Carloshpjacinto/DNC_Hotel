@@ -11,6 +11,7 @@ import { UpdateStatusReservationsService } from '../services/updateStatusReserva
 import { RoleGuard } from 'src/shared/guards/role.guard';
 import { Roles } from 'src/shared/decorators/roles.decorators';
 import { FindByUserReservationsService } from '../services/findByUserReservations.service';
+import { FindByHotelReservationsService } from '../services/findByHotelReservations.service';
 
 @UseGuards(AuthGuard, RoleGuard)
 @Controller('reservations')
@@ -19,6 +20,7 @@ export class ReservationsController {
     private readonly createReservationsService: CreateReservationsService,
     private readonly findAllReservationsService: FindAllReservationsService,
     private readonly findByIdReservationsService: FindByIdReservationsService,
+    private readonly findByHotelReservationsService: FindByHotelReservationsService,
     private readonly updateStatusReservationsService: UpdateStatusReservationsService,
     private readonly findByUserReservationsService: FindByUserReservationsService,
   ) {}
@@ -37,6 +39,11 @@ export class ReservationsController {
   @Get('user')
   findByUser(@User('id') id: number) {
     return this.findByUserReservationsService.execute(id);
+  }
+
+  @Get('hotel/:id')
+  findByHotel(@ParamId() id: number) {
+    return this.findByHotelReservationsService.execute(id);
   }
 
   @Get(':id')

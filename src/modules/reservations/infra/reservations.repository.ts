@@ -41,6 +41,24 @@ export class ReservationRepository implements IReservationRepository {
     });
   }
 
+  findByHotel(hotelId: number): Promise<Reservation[]> {
+    return this.prisma.reservation
+      .findMany({
+        where: { hotelId },
+        orderBy: { id: 'desc' },
+        include: { user: true },
+      })
+      .then((reservations) => {
+        return reservations.map((reservation) => {
+          if (reservation.user.avatar) {
+            reservation.user.avatar = `${process.env.APP_API_URL}/user-avatar/${reservation.user.avatar}`;
+          }
+
+          return reservation;
+        });
+      });
+  }
+
   updateStatus(id: number, status: ReservationStatus): Promise<Reservation> {
     return this.prisma.reservation.update({ where: { id }, data: { status } });
   }

@@ -6,5 +6,6 @@ export interface IReservationRepository {
   findById(id: number): Promise<Reservation>;
   findAll(): Promise<Reservation[]>;
   findByUser(userId: number): Promise<Reservation[]>;
+  findByHotel(hotelId: number): Promise<Reservation[]>;
   updateStatus(id: number, status: ReservationStatus): Promise<Reservation>;
 }
