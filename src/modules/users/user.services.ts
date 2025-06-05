@@ -5,12 +5,15 @@ import { CreateUserDTO } from './domain/dto/createUser.dto';
 import { UpdateUserDTO } from './domain/dto/updateUser.dto';
 import * as bcrypt from 'bcrypt';
 import { userSelectFields } from '../utils/userSelectFields';
+import { join, resolve } from 'path';
+import { stat, unlink } from 'fs/promises';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createUser(body: CreateUserDTO): Promise<User> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     body.password = await this.hashPassword(body.password);
     return await this.prisma.user.create({
       data: body,
@@ -25,15 +28,23 @@ export class UserService {
   async show(id: number) {
     await this.isIdExists(id);
 
-    return await this.prisma.user.findUnique({
-      where: { id },
-      select: userSelectFields,
-    });
+    return await this.prisma.user
+      .findUnique({
+        where: { id },
+        select: userSelectFields,
+      })
+      .then((user) => {
+        if (user.avatar) {
+          user.avatar = `${process.env.APP_API_URL}/user-avatar/${user.avatar}`;
+        }
+        return user;
+      });
   }
 
   async update(id: number, body: UpdateUserDTO) {
     await this.isIdExists(id);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     if (body.password) body.password = await this.hashPassword(body.password);
 
     return await this.prisma.user.update({
@@ -57,7 +68,26 @@ export class UserService {
     });
   }
 
+  async uploadAvatar(id: number, avatarFilename: string) {
+    const user = await this.isIdExists(id);
+    const directory = resolve(__dirname, '..', '..', '..', 'uploads');
+
+    if (user.avatar) {
+      const userAvatarFilePath = join(directory, user.avatar);
+      const userAvatarFileExists = await stat(userAvatarFilePath);
+
+      if (userAvatarFileExists) {
+        await unlink(userAvatarFilePath);
+      }
+    }
+
+    const userUpdated = await this.update(id, { avatar: avatarFilename });
+
+    return userUpdated;
+  }
+
   private async hashPassword(password: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     return await bcrypt.hash(password, 10);
   }
 
